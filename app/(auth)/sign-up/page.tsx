@@ -7,9 +7,12 @@ import SelectField from "@/components/forms/selectField";
 import {INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS} from "@/lib/constants";
 import {CountrySelectField} from "@/components/forms/CountrySelectField";
 import FooterLink from "@/components/forms/FooterLink";
+import {signUpWithEmail} from "@/lib/actions/auth.actions";
+import {useRouter} from "next/navigation";
+import {toast} from "sonner";
 
 const SignUpPage = () => {
-
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -29,10 +32,16 @@ const SignUpPage = () => {
     });
 
     const onSubmit = async (data: SignUpFormData) => {
+        console.log("Fucking do something");
         try{
-            console.log(data);
+            console.log("Trying to signup");
+            const result = await signUpWithEmail(data);
+            if(result.success) router.push("/");
         }catch(e){
             console.error(e);
+            toast.error('Sign Up Failed', {
+                description: e instanceof Error ? e.message : 'Failed to create an account'
+            })
         }
     }
 
@@ -56,7 +65,7 @@ const SignUpPage = () => {
                     placeholder="contact@johndoe.com"
                     register={register}
                     error={errors.email}
-                    validation={{required: 'Email is required', pattern: /^w+@\w+\.\w+$/, message: 'Email is required' }}
+                    validation={{required: 'Email is required', pattern: /^\w+@\w+\.\w+$/, message: 'Email is required' }}
                 />
                 <InputField
                     name="password"
@@ -77,7 +86,7 @@ const SignUpPage = () => {
                 />
 
                 <SelectField
-                    name="ivestmentGoals"
+                    name="investmentGoals"
                     label="Investment Goals"
                     placeholder="Select your investment goal"
                     options={INVESTMENT_GOALS}
