@@ -4,8 +4,13 @@ import {useForm} from "react-hook-form";
 import InputField from "@/components/forms/inputField";
 import {Button} from "@/components/ui/button";
 import FooterLink from "@/components/forms/FooterLink";
+import {signInWithEmail} from "@/lib/actions/auth.actions";
+import {useRouter} from "next/navigation";
+import {toast} from "sonner";
 
 const SignInPage = () => {
+
+    const router = useRouter();
 
     const {
         register,
@@ -22,12 +27,15 @@ const SignInPage = () => {
 
     const onSubmit = async (data: SignInFormData) => {
         try{
-            console.log(data);
+            const result = await signInWithEmail(data);
+            if(result.success) router.push("/");
         }catch(e){
             console.error(e);
+            toast.error('Sign In Failed', {
+                description: e instanceof Error ? e.message : 'Failed to create an account'
+            })
         }
     }
-
 
     return (
         <>
@@ -40,7 +48,7 @@ const SignInPage = () => {
                 placeholder="contact@johndoe.com"
                 register={register}
                 error={errors.email}
-                validation={{required: 'Email is required', pattern: /^w+@\w+\.\w+$/, message: 'Email is required' }}
+                validation={{required: 'Email is required', pattern: /^\w+@\w+\.\w+$/, message: 'Email is required' }}
             />
 
             <InputField
